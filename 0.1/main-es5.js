@@ -1914,12 +1914,8 @@ var AppComponent = /** @class */ (function () {
         this.username = '';
         this.enabledFeature = {};
         this.enabledPermission = {};
-        var userInfo = ls.getUserInfo();
-        this.companyName = userInfo && userInfo.company ? userInfo.company.companyName : '';
-        this.altCompanyName = this.companyName.toUpperCase();
-        this.username = userInfo && userInfo.username ? userInfo.username : '';
+        this.initUserInfo();
         this.enabledFeature = FeatureService.EnabledFeature;
-        this.enabledPermission = this.ls.getPermissions();
         this.router.events.subscribe(function (event) {
             _this.navigationInterceptor(event);
         });
@@ -1947,23 +1943,24 @@ var AppComponent = /** @class */ (function () {
     AppComponent.prototype.logout = function () {
         this.ls.logout();
     };
+    AppComponent.prototype.initUserInfo = function () {
+        this.userInfo = this.ls.getUserInfo();
+        this.companyName = this.userInfo && this.userInfo.company ? this.userInfo.company.companyName : '';
+        this.altCompanyName = this.companyName.toUpperCase();
+        this.username = this.userInfo && this.userInfo.username ? this.userInfo.username : '';
+        this.enabledPermission = this.ls.getPermissions();
+    };
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
         if (this.ls.initToken()) {
             this.isLoggedIn = true;
         }
-        this.companyName = this.ls.userInfo.company.companyName;
-        this.altCompanyName = this.companyName.toUpperCase();
-        this.username = this.ls.userInfo.username;
-        this.enabledPermission = this.ls.getPermissions();
+        this.initUserInfo();
         this.ls.changedObj.subscribe(function (userInfo) {
-            _this.companyName = _this.ls.userInfo.company.companyName;
-            _this.altCompanyName = _this.companyName.toUpperCase();
-            _this.username = _this.ls.userInfo.username;
-            _this.enabledPermission = _this.ls.getPermissions();
+            _this.initUserInfo();
         });
         this.ls.changed.subscribe(function (isLoggedIn) {
-            console.log(isLoggedIn);
+            console.log('Is logged in', isLoggedIn);
             _this.isLoggedIn = isLoggedIn;
             _this.companyName = '';
             _this.altCompanyName = '';
@@ -7099,8 +7096,6 @@ var RatingCardAddComponent = /** @class */ (function () {
         this.dp = dp;
         this.toastr = toastr;
         this.ap = ap;
-        // Local template var
-        this.selectedLocation = '';
         this.selectedLocationRates = {
             majorPriceLevels: [],
             minorPriceLevels: [],

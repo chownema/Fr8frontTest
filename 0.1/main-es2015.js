@@ -1909,12 +1909,8 @@ let AppComponent = class AppComponent {
         this.username = '';
         this.enabledFeature = {};
         this.enabledPermission = {};
-        const userInfo = ls.getUserInfo();
-        this.companyName = userInfo && userInfo.company ? userInfo.company.companyName : '';
-        this.altCompanyName = this.companyName.toUpperCase();
-        this.username = userInfo && userInfo.username ? userInfo.username : '';
+        this.initUserInfo();
         this.enabledFeature = FeatureService.EnabledFeature;
-        this.enabledPermission = this.ls.getPermissions();
         this.router.events.subscribe((event) => {
             this.navigationInterceptor(event);
         });
@@ -1942,22 +1938,23 @@ let AppComponent = class AppComponent {
     logout() {
         this.ls.logout();
     }
+    initUserInfo() {
+        this.userInfo = this.ls.getUserInfo();
+        this.companyName = this.userInfo && this.userInfo.company ? this.userInfo.company.companyName : '';
+        this.altCompanyName = this.companyName.toUpperCase();
+        this.username = this.userInfo && this.userInfo.username ? this.userInfo.username : '';
+        this.enabledPermission = this.ls.getPermissions();
+    }
     ngOnInit() {
         if (this.ls.initToken()) {
             this.isLoggedIn = true;
         }
-        this.companyName = this.ls.userInfo.company.companyName;
-        this.altCompanyName = this.companyName.toUpperCase();
-        this.username = this.ls.userInfo.username;
-        this.enabledPermission = this.ls.getPermissions();
+        this.initUserInfo();
         this.ls.changedObj.subscribe(userInfo => {
-            this.companyName = this.ls.userInfo.company.companyName;
-            this.altCompanyName = this.companyName.toUpperCase();
-            this.username = this.ls.userInfo.username;
-            this.enabledPermission = this.ls.getPermissions();
+            this.initUserInfo();
         });
         this.ls.changed.subscribe(isLoggedIn => {
-            console.log(isLoggedIn);
+            console.log('Is logged in', isLoggedIn);
             this.isLoggedIn = isLoggedIn;
             this.companyName = '';
             this.altCompanyName = '';
@@ -6839,8 +6836,6 @@ let RatingCardAddComponent = class RatingCardAddComponent {
         this.dp = dp;
         this.toastr = toastr;
         this.ap = ap;
-        // Local template var
-        this.selectedLocation = '';
         this.selectedLocationRates = {
             majorPriceLevels: [],
             minorPriceLevels: [],
